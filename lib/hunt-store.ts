@@ -9,7 +9,7 @@ import type {
   Unlock
 } from "@/types/hunt";
 import { SEED_FACTS } from "@/lib/content";
-import { firebaseDb, hasFirebaseEnv } from "@/lib/firebase-admin";
+import { explainFirebaseError, firebaseDb, hasFirebaseEnv } from "@/lib/firebase-admin";
 import { isValidPiece } from "@/lib/pieces";
 import { readLocalDb, writeLocalDb } from "@/lib/local-store";
 import { completionCode, displayName, elapsedSeconds, hashValue, makeId, nowIso } from "@/lib/utils";
@@ -48,8 +48,12 @@ function assertProductionPersistence() {
 }
 
 async function allDocuments<T>(name: string): Promise<T[]> {
-  const snapshot = await firebaseDb().collection(name).get();
-  return snapshot.docs.map((doc) => doc.data() as T);
+  try {
+    const snapshot = await firebaseDb().collection(name).get();
+    return snapshot.docs.map((doc) => doc.data() as T);
+  } catch (error) {
+    throw explainFirebaseError(error);
+  }
 }
 
 export async function ensureSeedContent() {

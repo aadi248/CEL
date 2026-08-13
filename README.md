@@ -25,6 +25,7 @@ Without Firebase credentials, local development stores data in `data/local-db.js
 ## Firebase + Vercel
 
 1. Create a Firebase project and enable Firestore in Native mode.
+   Create a Standard edition database with ID `(default)`; enabling the API alone does not create one.
 2. Create a service account in Firebase project settings.
 3. Add these Vercel environment variables:
 
@@ -37,6 +38,8 @@ GENERATOR_PASSWORD=admin@1234
 GENERATOR_SESSION_SECRET=a-long-random-secret
 ADMIN_PASSWORD=a-separate-control-room-password
 ```
+
+The application uses the `(default)` Firestore database. If you intentionally created a named database instead, add `FIREBASE_DATABASE_ID=your-database-id` in both `.env.local` and Vercel.
 
 `FIREBASE_SERVICE_ACCOUNT_KEY` is server-only. Do not expose it with a `NEXT_PUBLIC_` prefix. As an alternative, set `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` separately.
 

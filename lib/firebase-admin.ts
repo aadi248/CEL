@@ -29,6 +29,21 @@ export function hasFirebaseEnv() {
   );
 }
 
+export function firebaseDatabaseId() {
+  return process.env.FIREBASE_DATABASE_ID?.trim() || "(default)";
+}
+
+export function explainFirebaseError(error: unknown): Error {
+  const candidate = error as { code?: string | number; message?: string };
+  if (candidate?.code === 5 || candidate?.code === "5" || candidate?.code === "not-found") {
+    return new Error(
+      `Firestore database "${firebaseDatabaseId()}" was not found in project "${process.env.FIREBASE_PROJECT_ID}". ` +
+      "Create the database in Firebase Console → Build → Firestore Database, then restart the app."
+    );
+  }
+  return error instanceof Error ? error : new Error("Firebase operation failed.");
+}
+
 let cached: Firestore | null = null;
 
 export function firebaseDb() {
@@ -39,7 +54,7 @@ export function firebaseDb() {
     credential: cert(credentials),
     projectId: process.env.FIREBASE_PROJECT_ID
   });
-  cached = getFirestore(app);
+  cached = getFirestore(app, firebaseDatabaseId());
   cached.settings({ ignoreUndefinedProperties: true });
   return cached;
 }
