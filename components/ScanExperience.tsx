@@ -49,18 +49,19 @@ export function ScanExperience({ piece }: { piece: Piece }) {
   }, [piece.number]);
 
   useEffect(() => {
-    loadAndScan();
+    const timeout = window.setTimeout(() => void loadAndScan(), 0);
+    return () => window.clearTimeout(timeout);
   }, [loadAndScan]);
 
   if (state.loading) return <div className="loading">FINDING YOUR POSITION...</div>;
 
   if (!state.player) {
     return (
-      <section className="grid-layout">
+      <section className="scan-onboarding-layout">
         <div>
-          <div className="kicker">PIECE {String(piece.number).padStart(2, "0")} / 06</div>
+          <div className="eyebrow">YOUR FIRST FIND · PIECE {String(piece.number).padStart(2, "0")}</div>
           <h1 className="display-title">{piece.headline}</h1>
-          <p className="copy">Before the first scan, CEL needs a name for the index. Nothing too dramatic. Unless earned.</p>
+          <p className="copy">This poster found you first. Check in once with your name and BITS ID, and we&apos;ll snap this piece into your puzzle.</p>
         </div>
         <OnboardingForm onDone={loadAndScan} />
       </section>
@@ -71,22 +72,23 @@ export function ScanExperience({ piece }: { piece: Piece }) {
   const completed = foundPieces.length >= 6 || state.player.completed;
   const unlock: FunFact | null = state.result?.unlock ?? null;
   const messagePool = UNLOCK_MESSAGES[piece.number] ?? [];
+  const messageIndex = state.player.id.split("").reduce((sum, character) => sum + character.charCodeAt(0), piece.number) % Math.max(messagePool.length, 1);
   const message = state.result?.is_new_piece
-    ? messagePool[Math.floor(Math.random() * messagePool.length)] ?? messagePool[0]
+    ? messagePool[messageIndex] ?? messagePool[0]
     : "YOU ALREADY HAVE THIS PIECE. Fine. Here is a different note for your trouble.";
 
   return (
-    <section className="grid-layout scan-layout">
+    <section className="scan-layout">
       <div>
         <div className="mobile-scan-strip" aria-label={`${foundPieces.length} of 6 pieces found`}>
           <span>CEL / HUNT</span>
           <strong>{String(foundPieces.length).padStart(2, "0")} / 06</strong>
         </div>
-        <div className="kicker">PIECE {String(piece.number).padStart(2, "0")} / 06 · {piece.theme}</div>
+        <div className="eyebrow">PIECE {String(piece.number).padStart(2, "0")} / 06 · {piece.theme}</div>
         <h1 className="display-title">{state.result?.is_new_piece ? `PIECE ${String(piece.number).padStart(2, "0")} FOUND.` : "YOU ALREADY HAVE THIS PIECE."}</h1>
         <p className="copy">{state.error ?? message}</p>
-        <div className="panel">
-          <div className="label">{piece.visual}</div>
+        <div className="piece-story panel">
+          <div className="label">STARTUP BLUEPRINT · {piece.theme}</div>
           <h2 className="fact-title">{piece.headline}</h2>
           <p className="fact-body">{piece.proposition}</p>
         </div>

@@ -1,8 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabaseBrowser } from "@/lib/supabase-browser";
 import type { LeaderboardRow } from "@/types/hunt";
+
+function PieceRun({ pieces }: { pieces: number[] }) {
+  const found = new Set(pieces);
+  return (
+    <span className="piece-run" aria-label={`Scanned pieces: ${pieces.length ? pieces.join(", ") : "none"}`}>
+      {Array.from({ length: 6 }, (_, index) => {
+        const piece = index + 1;
+        return <span className={found.has(piece) ? "scanned" : undefined} key={piece}>{piece}</span>;
+      })}
+    </span>
+  );
+}
 
 export function LeaderboardTable({ initialRows = [], compact = false }: { initialRows?: LeaderboardRow[]; compact?: boolean }) {
   const [rows, setRows] = useState(initialRows);
@@ -18,16 +29,16 @@ export function LeaderboardTable({ initialRows = [], compact = false }: { initia
   }
 
   useEffect(() => {
-    load();
-    const supabase = supabaseBrowser();
-    if (!supabase) return;
-    const channel = supabase
-      .channel("cel-hunt-leaderboard")
-      .on("postgres_changes", { event: "*", schema: "public", table: "puzzle_scans" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "players" }, load)
-      .subscribe();
+    const initialLoad = window.setTimeout(() => void load(), 0);
+    const interval = window.setInterval(load, 5000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
-      supabase.removeChannel(channel);
+      window.clearTimeout(initialLoad);
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
@@ -35,13 +46,13 @@ export function LeaderboardTable({ initialRows = [], compact = false }: { initia
 
   return (
     <>
-      {mode === "local" ? <p className="source">LOCAL MODE: this leaderboard is not globally shared. Supabase enables live campus-wide updates.</p> : null}
+      {mode === "local" ? <p className="source">LOCAL DEVELOPMENT MODE · Connect Firebase before deploying to share this board event-wide.</p> : null}
       <table className="leaderboard">
         <thead>
           <tr>
             <th>#</th>
             <th>Player</th>
-            <th>Pieces</th>
+            <th>Scanned</th>
             <th>Status</th>
             {!compact ? <th className="desktop-only">Time</th> : null}
           </tr>
@@ -51,7 +62,7 @@ export function LeaderboardTable({ initialRows = [], compact = false }: { initia
             <tr key={row.player_id}>
               <td>{String(row.rank).padStart(2, "0")}</td>
               <td className="player">{row.display_name}</td>
-              <td>{row.pieces} / 6</td>
+              <td><PieceRun pieces={row.piece_numbers ?? []} /></td>
               <td className={row.completed ? "status-complete" : undefined}>{row.completed ? "COMPLETE" : `${row.pieces} / 6`}</td>
               {!compact ? <td className="desktop-only">{row.elapsed_seconds ? `${Math.round(row.elapsed_seconds / 60)}m` : "—"}</td> : null}
             </tr>

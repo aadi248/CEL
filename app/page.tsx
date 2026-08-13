@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
+import { StartupPuzzle } from "@/components/StartupPuzzle";
 import { getLeaderboard } from "@/lib/hunt-store";
 
 export const dynamic = "force-dynamic";
@@ -10,41 +11,54 @@ export default async function HomePage() {
   return (
     <main className="shell">
       <Header />
-      <div className="schematic" aria-hidden="true" />
-      <section className="hero">
-        <div>
-          <div className="kicker">CEL / BITS GOA</div>
-          <h1 className="hero-title">THE SIX-PIECE HUNT.</h1>
-          <p className="copy">
-            Six posters. Six scans. One oddly useful reward.
-            <br />
-            CEL has hidden six pieces around campus. Find them. Scan them. Complete the set.
+
+      <section className="home-hero">
+        <div className="hero-copy">
+          <div className="eyebrow"><span className="live-dot" /> CEL / BITS GOA CAMPUS EVENT</div>
+          <h1 className="hero-title">FIND SIX.<br /><em>BUILD ONE.</em></h1>
+          <p className="copy hero-description">
+            Six startup-themed posters are hiding around campus. Scan each QR, lock its piece into your board, and race to complete the full picture.
           </p>
           <div className="actions">
-            <Link className="button maroon" href="/scan/1">
-              START THE HUNT →
-            </Link>
-            <Link className="button secondary" href="/leaderboard">
-              VIEW THE INDEX
-            </Link>
+            <a className="button maroon" href="#how-it-works">HOW IT WORKS ↓</a>
+            <Link className="button secondary" href="/leaderboard">VIEW LIVE BOARD</Link>
           </div>
+          <p className="hero-note">YOUR FIRST SCAN ASKS FOR ONLY YOUR NAME + BITS ID.</p>
         </div>
-        <div className="grid-layout">
-          <section className="panel">
-            <div className="label">NEXUS HYDERABAD</div>
-            <h2 className="section-title">ROOM WORTH BEING IN.</h2>
-            <p className="copy">
-              Held at Radisson HITEC City. Limited to 100 participants. Built for startups, VCs, founders, and CEL students who
-              were fully sponsored into the room.
-            </p>
-          </section>
-          <section className="panel">
-            <div className="label">LIVE INDEX</div>
-            <LeaderboardTable initialRows={rows} compact />
-          </section>
+        <div className="hero-puzzle-wrap">
+          <div className="puzzle-caption"><span>THE STARTUP BLUEPRINT</span><span>06 / 06</span></div>
+          <StartupPuzzle showcase />
+          <div className="puzzle-stamp">COMPLETE THE SET</div>
         </div>
-        <div className="meta">Built by CEL · BITS Pilani Goa</div>
       </section>
+
+      <section className="flow-strip" id="how-it-works" aria-label="How the hunt works">
+        <article><span>01</span><div><strong>SPOT A POSTER</strong><p>Look around campus for one of six CEL event posters.</p></div></article>
+        <article><span>02</span><div><strong>SCAN ITS QR</strong><p>Every unique code reveals and locks in the matching piece.</p></div></article>
+        <article><span>03</span><div><strong>FINISH THE PUZZLE</strong><p>Track exactly who has found which pieces on the live board.</p></div></article>
+      </section>
+
+      <section className="home-content-grid">
+        <article className="feature-panel">
+          <div className="label">WHAT YOU&apos;RE BUILDING</div>
+          <h2 className="section-title">A STARTUP, PIECE BY PIECE.</h2>
+          <p className="copy">Network. Team. Product. Growth. Community. Launch. Each scan fills one part of the founder journey—no generic clip-art, no duplicate progress.</p>
+          <div className="feature-metrics">
+            <div><strong>6</strong><span>POSTERS</span></div>
+            <div><strong>1</strong><span>PUZZLE</span></div>
+            <div><strong>{rows.length}</strong><span>PLAYERS</span></div>
+          </div>
+        </article>
+        <article className="live-panel">
+          <div className="section-heading compact-heading">
+            <div><span className="label">LIVE EVENT BOARD</span><h2>WHO FOUND WHAT</h2></div>
+            <Link href="/leaderboard" className="text-link">VIEW ALL →</Link>
+          </div>
+          <LeaderboardTable initialRows={rows} compact />
+        </article>
+      </section>
+
+      <footer className="site-footer"><span>CEL · BITS PILANI GOA</span><span>SCAN · ASSEMBLE · COMPLETE</span></footer>
     </main>
   );
 }

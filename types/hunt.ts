@@ -4,7 +4,6 @@ export type Player = {
   id: string;
   nickname: string;
   first_name: string;
-  branch: string | null;
   bits_id_hash: string | null;
   created_at: string;
   updated_at: string;
@@ -69,6 +68,18 @@ export type LeaderboardRow = {
   completed: boolean;
   completion_time: string | null;
   elapsed_seconds: number | null;
+  piece_numbers: number[];
+};
+
+export type GeneratedQrCode = {
+  id: string;
+  label: string;
+  target: string;
+  notes: string | null;
+  foreground: string;
+  background: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type ScanResult = {

@@ -1,85 +1,82 @@
 # CEL — The Six-Piece Hunt
 
-Production-ready campus activation for CEL BITS Goa induction season. Students scan six physical QR posters, unlock sourced startup facts or dry jokes, see persistent progress, watch a live leaderboard, and receive an eligibility card after completing all six pieces.
+A campus event experience for CEL BITS Goa. Six physical posters each carry a unique QR code. A participant checks in once with their name and BITS ID, then every unique scan locks one startup-themed jigsaw piece into their board. The live leaderboard shows exactly which of pieces 01–06 each player has found.
 
 ## Stack
 
-- Next.js App Router
-- Supabase Postgres + Realtime in production
-- Local JSON fallback for development when Supabase env vars are absent
-- Programmatic QR generation through `qrcode`
+- Next.js App Router, ready for Vercel
+- Firebase Firestore through the server-only Firebase Admin SDK
+- Signed, HTTP-only session for the protected QR workspace
+- Programmatic PNG/SVG generation with `qrcode`
+- Local JSON fallback for development only
 
-## Setup
+Node.js 20.9 or newer is required (matching Next.js 16 and Vercel's current Node runtime).
 
-1. Install dependencies:
+## Local setup
 
 ```bash
 npm install
-```
-
-2. Copy env values:
-
-```bash
 cp .env.example .env.local
+npm run dev
 ```
 
-3. For production, set:
+Without Firebase credentials, local development stores data in `data/local-db.json`. When deployed on Vercel the app intentionally requires Firebase credentials; it will not use Vercel's ephemeral filesystem as a database.
+
+## Firebase + Vercel
+
+1. Create a Firebase project and enable Firestore in Native mode.
+2. Create a service account in Firebase project settings.
+3. Add these Vercel environment variables:
 
 ```text
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_APP_URL=
-ADMIN_PASSWORD=
+NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_SERVICE_ACCOUNT_KEY=base64-or-raw-service-account-json
+GENERATOR_USERNAME=admin
+GENERATOR_PASSWORD=admin@1234
+GENERATOR_SESSION_SECRET=a-long-random-secret
+ADMIN_PASSWORD=a-separate-control-room-password
 ```
 
-4. Run the Supabase migration in `supabase/migrations/001_initial_schema.sql`.
+`FIREBASE_SERVICE_ACCOUNT_KEY` is server-only. Do not expose it with a `NEXT_PUBLIC_` prefix. As an alternative, set `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` separately.
 
-5. Seed content:
+Deploy the included locked-down Firestore rules if you use the Firebase CLI:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+All browser traffic goes through Vercel server routes, so the rules deny direct client access. BITS IDs are normalized and SHA-256 hashed before being saved.
+
+Seed the fact cards after configuring credentials:
 
 ```bash
 npm run seed
 ```
 
-6. Run locally:
+The collections are created automatically: `players`, `puzzle_scans`, `unlocks`, `fun_facts`, `admin_settings`, and `qr_codes`.
 
-```bash
-npm run dev
+## Event QR workspace
+
+Open `/generate` and sign in. Defaults requested for this event:
+
+```text
+username: admin
+password: admin@1234
 ```
 
-Without Supabase credentials the app uses `data/local-db.json`. This is useful for local testing, but the leaderboard is not globally shared. Live campus-wide leaderboard updates require Supabase Realtime.
+Override both credentials in Vercel for a public deployment. The workspace provides print-ready PNG/SVG versions of the six poster codes and lets organizers save, download, copy, and delete additional event QR codes. `/admin/qr` redirects to this protected workspace.
 
-## QR Codes
+The six poster routes always encode:
 
-Runtime QR routes:
-
-- `/api/qr/1` through `/api/qr/6`
-- `/admin/qr` for the contact sheet
-
-Generate static QR assets:
-
-```bash
-npm run qr
+```text
+${NEXT_PUBLIC_APP_URL}/scan/1
+...
+${NEXT_PUBLIC_APP_URL}/scan/6
 ```
 
-Output goes to `public/generated/qr`.
-
-Each QR encodes `${NEXT_PUBLIC_APP_URL}/scan/{piece}`.
+Static QR assets can also be generated with `npm run qr`.
 
 ## Admin
 
-Hidden route:
-
-```text
-/admin
-```
-
-Use `ADMIN_PASSWORD` in production. Admin can view metrics, toggle the hunt, toggle leaderboard visibility, reset progress, export CSV, and manage fact/joke content.
-
-## Supabase Notes
-
-The service role key is used only in server routes and scripts. It is never exposed to the client. Public clients only subscribe to `players` and `puzzle_scans` for leaderboard refreshes. RLS allows public reads for leaderboard/content/settings and relies on server-side API routes for all writes.
-
-## CEL Logo
-
-The app uses `assets/logo.png` through `/api/logo`. Replace that file with the final supplied CEL logo asset before deployment.
+The separate `/admin` control room uses `ADMIN_PASSWORD` and can view event metrics, pause the hunt, hide the leaderboard, export CSV, reset progress, and manage unlock content.

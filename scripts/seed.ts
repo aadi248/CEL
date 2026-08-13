@@ -1,18 +1,31 @@
-import { createClient } from "@supabase/supabase-js";
+import { firebaseDb, hasFirebaseEnv } from "../lib/firebase-admin";
 import { SEED_FACTS } from "../lib/content";
 
 async function main() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    console.log("Supabase credentials missing. Seed content is already embedded for local mode.");
+  if (!hasFirebaseEnv()) {
+    console.log("Firebase Admin credentials are missing. Seed content remains embedded for local development mode.");
     return;
   }
-  const supabase = createClient(url, key, { auth: { persistSession: false } });
-  const { error } = await supabase.from("fun_facts").upsert(SEED_FACTS, { onConflict: "id" });
-  if (error) throw error;
-  await supabase.from("admin_settings").upsert({ id: "default", leaderboard_enabled: true, hunt_enabled: true, announcement: null }, { onConflict: "id" });
-  console.log(`Seeded ${SEED_FACTS.length} content cards.`);
+  const db = firebaseDb();
+  let batch = db.batch();
+  let operations = 0;
+  for (const item of SEED_FACTS) {
+    batch.set(db.collection("fun_facts").doc(item.id), item, { merge: true });
+    operations += 1;
+    if (operations === 400) {
+      await batch.commit();
+      batch = db.batch();
+      operations = 0;
+    }
+  }
+  batch.set(db.collection("admin_settings").doc("default"), {
+    id: "default",
+    leaderboard_enabled: true,
+    hunt_enabled: true,
+    announcement: null
+  }, { merge: true });
+  await batch.commit();
+  console.log(`Seeded ${SEED_FACTS.length} content cards into Firestore.`);
 }
 
 main().catch((error) => {

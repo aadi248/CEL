@@ -14,8 +14,8 @@ function shapeStats() {
     completionCount: 0,
     pieceCounts: [] as { piece: number; unique: number; total: number }[],
     mostPopular: null as null | { piece: number; unique: number; total: number },
-    leaderboard: [] as { rank: number; display_name: string; pieces: number; completed: boolean }[],
-    participants: [] as { id: string; nickname: string; branch: string | null; completed: boolean; created_at: string }[],
+    leaderboard: [] as { rank: number; display_name: string; pieces: number; piece_numbers: number[]; completed: boolean }[],
+    participants: [] as { id: string; nickname: string; completed: boolean; created_at: string }[],
     recentScans: [] as { id: string; player_id: string; piece_number: number; scan_count: number; last_scanned_at: string }[],
     content: [] as FunFact[],
     settings: { hunt_enabled: true, leaderboard_enabled: true, announcement: "" as string | null }
@@ -46,7 +46,8 @@ export function AdminPanel() {
   }, [headers]);
 
   useEffect(() => {
-    load();
+    const timeout = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timeout);
   }, [load]);
 
   async function saveSettings() {
@@ -98,7 +99,7 @@ export function AdminPanel() {
             <a className="button secondary" href={`/api/admin/export`} onClick={(event) => {
               if (password) (event.currentTarget as HTMLAnchorElement).href = `/api/admin/export?password=${encodeURIComponent(password)}`;
             }}>EXPORT CSV</a>
-            <a className="button secondary" href="/admin/qr">QR SHEET</a>
+            <a className="button secondary" href="/generate">QR WORKSPACE</a>
           </div>
           {error ? <p role="alert" className="source">{error}</p> : null}
         </section>
@@ -152,7 +153,6 @@ export function AdminPanel() {
               {stats.participants.slice(0, 12).map((player) => (
                 <tr key={player.id}>
                   <td className="player">{player.nickname}</td>
-                  <td>{player.branch ?? "—"}</td>
                   <td>{player.completed ? "COMPLETE" : "ACTIVE"}</td>
                 </tr>
               ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import clsx from "clsx";
+import { StartupPuzzle } from "@/components/StartupPuzzle";
 
 export function ProgressGrid({
   found,
@@ -15,22 +15,11 @@ export function ProgressGrid({
   return (
     <section className="panel" aria-label="Hunt progress">
       <div className="label">THE HUNT</div>
-      <div className="piece-grid">
-        {Array.from({ length: 6 }, (_, index) => {
-          const piece = index + 1;
-          const isFound = uniqueFound.includes(piece);
-          return (
-            <div
-              className={clsx("piece-cell", isFound && "found", current === piece && "current", justUnlocked === piece && "just-unlocked")}
-              key={piece}
-              aria-label={`Piece ${piece} ${isFound ? "found" : "locked"}`}
-            >
-              <span>{String(piece).padStart(2, "0")}</span>
-            </div>
-          );
-        })}
+      <StartupPuzzle found={uniqueFound} current={current} justUnlocked={justUnlocked} />
+      <div className="progress-summary">
+        <strong>{String(uniqueFound.length).padStart(2, "0")}</strong>
+        <span>of 06 pieces locked in</span>
       </div>
-      <div className="meta">{String(uniqueFound.length).padStart(2, "0")} / 06 FOUND</div>
     </section>
   );
 }

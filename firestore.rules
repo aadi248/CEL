@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // The app reads and writes through authenticated Vercel server routes using
+    // Firebase Admin. No player identifiers or event controls are client-readable.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

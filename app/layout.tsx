@@ -8,10 +8,10 @@ const sans = Inter({ subsets: ["latin"], variable: "--sans-font", display: "swap
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   title: "CEL — The Six-Piece Hunt",
-  description: "Find six CEL posters around BITS Goa. Scan them all. Unlock the final opportunity.",
+  description: "Find six CEL posters around BITS Goa, scan each QR, and complete the startup puzzle.",
   openGraph: {
     title: "CEL — The Six-Piece Hunt",
-    description: "Find six CEL posters around BITS Goa. Scan them all. Unlock the final opportunity.",
+    description: "Find six CEL posters around BITS Goa, scan each QR, and complete the startup puzzle.",
     images: ["/api/logo"]
   }
 };
@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body className={`${serif.variable} ${sans.variable}`}>
         <div className="paper-noise" aria-hidden="true" />
         {children}
