@@ -22,6 +22,7 @@ export default async function HomePage() {
           <div className="actions">
             <a className="button maroon" href="#how-it-works">HOW IT WORKS ↓</a>
             <Link className="button secondary" href="/leaderboard">VIEW LIVE BOARD</Link>
+            <Link className="text-link hero-challenge-link" href="/challenge">OR WIN A PIECE IN THE FORGE →</Link>
           </div>
           <p className="hero-note">YOUR FIRST SCAN ASKS FOR ONLY YOUR NAME + BITS ID.</p>
         </div>
@@ -36,6 +37,12 @@ export default async function HomePage() {
         <article><span>01</span><div><strong>SPOT A POSTER</strong><p>Look around campus for one of six CEL event posters.</p></div></article>
         <article><span>02</span><div><strong>SCAN ITS QR</strong><p>Every unique code reveals and locks in the matching piece.</p></div></article>
         <article><span>03</span><div><strong>FINISH THE PUZZLE</strong><p>Track exactly who has found which pieces on the live board.</p></div></article>
+      </section>
+
+      <section className="forge-callout">
+        <div><span className="label">ALTERNATE ROUTE</span><h2>NO POSTER NEARBY? EARN A PIECE.</h2></div>
+        <p>Answer one startup judgment question in 15 seconds. A correct answer unlocks one missing puzzle piece. One attempt every three hours.</p>
+        <Link className="button maroon" href="/challenge">ENTER THE FORGE →</Link>
       </section>
 
       <section className="home-content-grid">

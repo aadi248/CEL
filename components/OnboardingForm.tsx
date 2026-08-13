@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function OnboardingForm({ onDone }: { onDone: () => void }) {
+export function OnboardingForm({ onDone, context = "scan" }: { onDone: () => void; context?: "scan" | "challenge" }) {
   const [nickname, setNickname] = useState("");
   const [bitsId, setBitsId] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export function OnboardingForm({ onDone }: { onDone: () => void }) {
   return (
     <form className="unlock-card" onSubmit={submit}>
       <div className="label">ONE-TIME CHECK-IN</div>
-      <h2>LET&apos;S MARK YOUR FIRST PIECE.</h2>
+      <h2>{context === "challenge" ? "ENTER THE FORGE." : "LET'S MARK YOUR FIRST PIECE."}</h2>
       <label className="field">
         <span className="label">Name</span>
         <input value={nickname} onChange={(event) => setNickname(event.target.value)} required minLength={2} autoComplete="name" placeholder="How you should appear on the board" />
@@ -41,7 +41,7 @@ export function OnboardingForm({ onDone }: { onDone: () => void }) {
       </label>
       {error ? <p role="alert">{error}</p> : null}
       <button className="button maroon" disabled={busy} type="submit">
-        {busy ? "CALIBRATING..." : "ENTER THE HUNT →"}
+        {busy ? "CALIBRATING..." : context === "challenge" ? "START THE CHALLENGE →" : "ENTER THE HUNT →"}
       </button>
       <p className="source">You only do this once. Your BITS ID is hashed before it reaches storage.</p>
     </form>

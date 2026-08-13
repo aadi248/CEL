@@ -1,6 +1,6 @@
 # CEL — The Six-Piece Hunt
 
-A campus event experience for CEL BITS Goa. Six physical posters each carry a unique QR code. A participant checks in once with their name and BITS ID, then every unique scan locks one startup-themed jigsaw piece into their board. The live leaderboard shows exactly which of pieces 01–06 each player has found.
+A campus event experience for CEL BITS Goa. Six physical posters each carry a unique QR code. A participant checks in once with their name and BITS ID, then every unique scan locks one startup-themed jigsaw piece into their board. Participants can alternatively earn a missing piece by answering a FORGE question within 15 seconds, with one attempt every three hours. The live leaderboard shows exactly which of pieces 01–06 each player has found.
 
 ## Stack
 
@@ -54,7 +54,17 @@ Seed the fact cards after configuring credentials:
 npm run seed
 ```
 
-The collections are created automatically: `players`, `puzzle_scans`, `unlocks`, `fun_facts`, `admin_settings`, and `qr_codes`.
+The collections are created automatically: `players`, `puzzle_scans`, `unlocks`, `fun_facts`, `admin_settings`, `qr_codes`, `quiz_attempts`, and `quiz_states`.
+
+## FORGE challenge
+
+`/challenge` is the alternate route to puzzle progress. It uses all 50 questions extracted from `forge-question-bank.md.pdf` and avoids repeating a question for a participant until they have cycled through the full bank.
+
+- Revealing a question starts a server-validated 15-second timer.
+- A correct answer awards one piece the participant has not already found.
+- An incorrect, expired, abandoned, or refreshed attempt awards nothing.
+- Starting an attempt immediately starts a three-hour cooldown, including abandoned attempts.
+- Answers and expiry timestamps are validated by the server; the browser never receives the answer while a question is active.
 
 ## Event QR workspace
 

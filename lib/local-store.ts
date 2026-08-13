@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { AdminSettings, FunFact, GeneratedQrCode, Player, PuzzleScan, Unlock } from "@/types/hunt";
+import type { AdminSettings, FunFact, GeneratedQrCode, Player, PuzzleScan, QuizAttempt, QuizState, Unlock } from "@/types/hunt";
 import { SEED_FACTS } from "@/lib/content";
 
 type LocalDb = {
@@ -10,6 +10,8 @@ type LocalDb = {
   fun_facts: FunFact[];
   admin_settings: AdminSettings[];
   qr_codes: GeneratedQrCode[];
+  quiz_attempts: QuizAttempt[];
+  quiz_states: QuizState[];
 };
 
 const dbPath = path.join(process.cwd(), "data", "local-db.json");
@@ -28,7 +30,9 @@ function freshDb(): LocalDb {
     unlocks: [],
     fun_facts: SEED_FACTS,
     admin_settings: [defaultSettings],
-    qr_codes: []
+    qr_codes: [],
+    quiz_attempts: [],
+    quiz_states: []
   };
 }
 
@@ -42,6 +46,8 @@ export async function readLocalDb(): Promise<LocalDb> {
     if (!parsed.fun_facts?.length) parsed.fun_facts = SEED_FACTS;
     if (!parsed.admin_settings?.length) parsed.admin_settings = [defaultSettings];
     if (!parsed.qr_codes) parsed.qr_codes = [];
+    if (!parsed.quiz_attempts) parsed.quiz_attempts = [];
+    if (!parsed.quiz_states) parsed.quiz_states = [];
     return parsed;
   } catch {
     const db = freshDb();

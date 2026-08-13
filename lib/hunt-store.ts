@@ -32,7 +32,9 @@ const collections = {
   unlocks: "unlocks",
   content: "fun_facts",
   settings: "admin_settings",
-  qrCodes: "qr_codes"
+  qrCodes: "qr_codes",
+  quizAttempts: "quiz_attempts",
+  quizStates: "quiz_states"
 } as const;
 
 export function backendMode() {
@@ -183,7 +185,8 @@ export async function recordScan(playerId: string, pieceNumber: number): Promise
           first_scanned_at: now,
           last_scanned_at: now,
           scan_count: 1,
-          unique_scan: true
+          unique_scan: true,
+          acquisition_method: "qr"
         };
         transaction.set(scanRef, scan);
       }
@@ -232,7 +235,8 @@ export async function recordScan(playerId: string, pieceNumber: number): Promise
       first_scanned_at: now,
       last_scanned_at: now,
       scan_count: 1,
-      unique_scan: true
+      unique_scan: true,
+      acquisition_method: "qr"
     };
     db.puzzle_scans.push(scan);
   }
@@ -294,6 +298,9 @@ export async function getAdminStats() {
       }
     : local!;
   const uniqueScans = store.puzzle_scans.filter((scan) => scan.unique_scan);
+  const quizAttempts = hasFirebaseEnv()
+    ? await allDocuments<import("@/types/hunt").QuizAttempt>(collections.quizAttempts)
+    : local!.quiz_attempts;
   const pieceCounts = Array.from({ length: 6 }, (_, index) => {
     const piece = index + 1;
     return {
@@ -309,6 +316,8 @@ export async function getAdminStats() {
     totalScans: store.puzzle_scans.reduce((sum, scan) => sum + scan.scan_count, 0),
     uniqueScans: uniqueScans.length,
     completionCount: store.players.filter((player) => player.completed).length,
+    totalQuizAttempts: quizAttempts.length,
+    quizWins: quizAttempts.filter((attempt) => attempt.status === "correct").length,
     pieceCounts,
     mostPopular: [...pieceCounts].sort((a, b) => b.total - a.total)[0],
     leaderboard: await getLeaderboard(),
@@ -331,6 +340,8 @@ async function deleteFirebaseCollection(name: string) {
 
 export async function resetProgress() {
   if (hasFirebaseEnv()) {
+    await deleteFirebaseCollection(collections.quizAttempts);
+    await deleteFirebaseCollection(collections.quizStates);
     await deleteFirebaseCollection(collections.unlocks);
     await deleteFirebaseCollection(collections.scans);
     await deleteFirebaseCollection(collections.players);
@@ -340,6 +351,8 @@ export async function resetProgress() {
   db.players = [];
   db.puzzle_scans = [];
   db.unlocks = [];
+  db.quiz_attempts = [];
+  db.quiz_states = [];
   await writeLocalDb(db);
 }
 

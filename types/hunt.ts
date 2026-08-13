@@ -19,6 +19,30 @@ export type PuzzleScan = {
   last_scanned_at: string;
   scan_count: number;
   unique_scan: boolean;
+  acquisition_method?: "qr" | "quiz";
+};
+
+export type QuizAttemptStatus = "active" | "correct" | "incorrect" | "expired";
+
+export type QuizAttempt = {
+  id: string;
+  player_id: string;
+  question_id: string;
+  started_at: string;
+  expires_at: string;
+  submitted_at: string | null;
+  selected_index: number | null;
+  status: QuizAttemptStatus;
+  awarded_piece: number | null;
+};
+
+export type QuizState = {
+  id: string;
+  player_id: string;
+  active_attempt_id: string | null;
+  next_available_at: string;
+  question_history: string[];
+  updated_at: string;
 };
 
 export type Unlock = {

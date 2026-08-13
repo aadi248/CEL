@@ -14,6 +14,7 @@ export function Header({ progress }: { progress?: string }) {
       </Link>
       <nav className="nav" aria-label="Primary navigation">
         <Link href="/">THE HUNT</Link>
+        <Link href="/challenge">FORGE</Link>
         <Link href="/leaderboard">LIVE BOARD</Link>
         {progress ? <span aria-label={`Progress ${progress}`}>{progress}</span> : null}
       </nav>

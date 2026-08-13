@@ -12,6 +12,8 @@ function shapeStats() {
     totalScans: 0,
     uniqueScans: 0,
     completionCount: 0,
+    totalQuizAttempts: 0,
+    quizWins: 0,
     pieceCounts: [] as { piece: number; unique: number; total: number }[],
     mostPopular: null as null | { piece: number; unique: number; total: number },
     leaderboard: [] as { rank: number; display_name: string; pieces: number; piece_numbers: number[]; completed: boolean }[],
@@ -109,6 +111,8 @@ export function AdminPanel() {
           <div className="stat"><span className="label">Total scans</span><strong>{stats.totalScans}</strong></div>
           <div className="stat"><span className="label">Unique scans</span><strong>{stats.uniqueScans}</strong></div>
           <div className="stat"><span className="label">Complete</span><strong>{stats.completionCount}</strong></div>
+          <div className="stat"><span className="label">Quiz attempts</span><strong>{stats.totalQuizAttempts}</strong></div>
+          <div className="stat"><span className="label">Quiz wins</span><strong>{stats.quizWins}</strong></div>
         </section>
 
         <section className="panel">
