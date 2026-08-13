@@ -55,6 +55,5 @@ export function firebaseDb() {
     projectId: process.env.FIREBASE_PROJECT_ID
   });
   cached = getFirestore(app, firebaseDatabaseId());
-  cached.settings({ ignoreUndefinedProperties: true });
   return cached;
 }

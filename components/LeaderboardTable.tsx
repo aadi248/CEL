@@ -19,13 +19,25 @@ export function LeaderboardTable({ initialRows = [], compact = false }: { initia
   const [rows, setRows] = useState(initialRows);
   const [enabled, setEnabled] = useState(true);
   const [mode, setMode] = useState("local");
+  const [error, setError] = useState<string | null>(null);
 
   async function load() {
-    const response = await fetch("/api/leaderboard", { cache: "no-store" });
-    const data = await response.json();
-    setRows(data.rows ?? []);
-    setEnabled(Boolean(data.enabled));
-    setMode(data.mode);
+    try {
+      const response = await fetch("/api/leaderboard", { cache: "no-store" });
+      const data = await response.json() as {
+        enabled?: boolean;
+        mode?: string;
+        rows?: LeaderboardRow[];
+        error?: string;
+      };
+      if (!response.ok) throw new Error(data.error ?? "Leaderboard temporarily unavailable.");
+      setRows(data.rows ?? []);
+      setEnabled(Boolean(data.enabled));
+      setMode(data.mode ?? "local");
+      setError(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Leaderboard temporarily unavailable.");
+    }
   }
 
   useEffect(() => {
@@ -46,7 +58,8 @@ export function LeaderboardTable({ initialRows = [], compact = false }: { initia
 
   return (
     <>
-      {mode === "local" ? <p className="source">LOCAL DEVELOPMENT MODE · Connect Firebase before deploying to share this board event-wide.</p> : null}
+      {error ? <p className="source" role="status">{error}</p> : null}
+      {!error && mode === "local" ? <p className="source">LOCAL DEVELOPMENT MODE · Connect Firebase before deploying to share this board event-wide.</p> : null}
       <table className="leaderboard">
         <thead>
           <tr>
