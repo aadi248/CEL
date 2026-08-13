@@ -11,7 +11,9 @@ export function QrGenerator({ baseUrl }: { baseUrl: string }) {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [codes, setCodes] = useState<GeneratedQrCode[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   const loadCodes = useCallback(async () => {
     const response = await fetch("/api/generate/codes", { cache: "no-store" });
@@ -91,6 +93,31 @@ export function QrGenerator({ baseUrl }: { baseUrl: string }) {
     await loadCodes();
   }
 
+  async function clearLeaderboard() {
+    const confirmed = confirm(
+      "Clear the leaderboard and delete all participant, scan, unlock and quiz progress? QR codes and event content will be kept. This cannot be undone."
+    );
+    if (!confirmed) return;
+
+    setClearing(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const response = await fetch("/api/generate/leaderboard", { method: "DELETE" });
+      const data = await response.json() as { ok?: boolean; error?: string };
+      if (response.status === 401) {
+        setAuthenticated(false);
+        throw new Error("Your generator session expired. Sign in again.");
+      }
+      if (!response.ok) throw new Error(data.error ?? "Could not clear the leaderboard.");
+      setNotice("Leaderboard cleared. QR codes and event content were kept.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not clear the leaderboard.");
+    } finally {
+      setClearing(false);
+    }
+  }
+
   if (authenticated === null) return <div className="loading">OPENING QR WORKSPACE...</div>;
 
   if (!authenticated) {
@@ -123,9 +150,15 @@ export function QrGenerator({ baseUrl }: { baseUrl: string }) {
         </div>
         <div className="actions no-print">
           <PrintButton />
+          <button className="button danger" disabled={clearing} onClick={clearLeaderboard} type="button">
+            {clearing ? "CLEARING..." : "CLEAR LEADERBOARD"}
+          </button>
           <button className="button secondary" onClick={signOut} type="button">SIGN OUT</button>
         </div>
       </section>
+
+      {notice ? <p className="operation-message success" role="status">{notice}</p> : null}
+      {error ? <p className="operation-message error" role="alert">{error}</p> : null}
 
       <div className="section-heading">
         <div><span className="label">PRIMARY SET</span><h2>SIX EVENT POSTERS</h2></div>
@@ -165,7 +198,6 @@ export function QrGenerator({ baseUrl }: { baseUrl: string }) {
               <label className="field"><span className="label">Foreground</span><input name="foreground" type="color" defaultValue="#111111" /></label>
               <label className="field"><span className="label">Background</span><input name="background" type="color" defaultValue="#f2efe6" /></label>
             </div>
-            {error ? <p role="alert">{error}</p> : null}
             <button className="button maroon" disabled={busy} type="submit">{busy ? "GENERATING..." : "GENERATE & SAVE →"}</button>
           </form>
 

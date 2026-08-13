@@ -142,6 +142,7 @@ img { max-width: 100%; height: auto; }
 .button:disabled { cursor: wait; opacity: 0.55; transform: none; }
 .button.secondary { color: var(--ink); background: transparent; }
 .button.maroon { border-color: var(--maroon); background: var(--maroon); }
+.button.danger { border-color: #a22626; color: #fff; background: #a22626; }
 .text-link, .text-button { border: 0; padding: 0; color: var(--maroon); background: none; cursor: pointer; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 .text-button.danger { color: #a22626; }
 
@@ -338,6 +339,9 @@ img { max-width: 100%; height: auto; }
 .auth-layout .display-title { margin: 18px 0 24px; }
 .generator-heading { padding-bottom: 35px; }
 .generator-heading .actions { justify-content: flex-end; }
+.operation-message { margin: -18px 0 30px; border-left: 3px solid currentColor; padding: 10px 13px; font-size: 12px; }
+.operation-message.success { color: #215f3b; background: rgba(33, 95, 59, 0.08); }
+.operation-message.error { color: #a22626; background: rgba(162, 38, 38, 0.08); }
 .poster-qr-grid { grid-template-columns: repeat(3, minmax(250px, 1fr)); }
 .qr-card { position: relative; overflow: hidden; border: 1px solid var(--rule-strong); padding: 18px; background: var(--surface); break-inside: avoid; }
 .qr-card::before { position: absolute; top: 0; right: 0; left: 0; height: 4px; content: ""; background: var(--piece-accent); }
