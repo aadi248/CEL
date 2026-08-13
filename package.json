@@ -1,0 +1,32 @@
+{
+  "name": "cel-six-piece-hunt",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx scripts/seed.ts",
+    "qr": "tsx scripts/generate-qr.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.55.0",
+    "clsx": "^2.1.1",
+    "next": "^15.4.6",
+    "qrcode": "^1.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.33.0",
+    "eslint-config-next": "^15.4.6",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  }
+}
