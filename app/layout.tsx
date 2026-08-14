@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Inter } from "next/font/google";
+import { WhatsAppInvite } from "@/components/WhatsAppInvite";
 import "@/app/globals.css";
 
 const serif = EB_Garamond({ subsets: ["latin"], variable: "--serif-font", display: "swap" });
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${serif.variable} ${sans.variable}`}>
         <div className="paper-noise" aria-hidden="true" />
         {children}
+        <WhatsAppInvite />
       </body>
     </html>
   );

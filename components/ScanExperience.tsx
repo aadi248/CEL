@@ -5,6 +5,7 @@ import { CompletionCard } from "@/components/CompletionCard";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { OnboardingForm } from "@/components/OnboardingForm";
 import { ProgressGrid } from "@/components/ProgressGrid";
+import { announceWhatsAppInvite } from "@/components/WhatsAppInvite";
 import type { FunFact, Piece, Player, PuzzleScan, ScanResult } from "@/types/hunt";
 import { UNLOCK_MESSAGES } from "@/lib/content";
 
@@ -37,6 +38,7 @@ export function ScanExperience({ piece }: { piece: Piece }) {
         return;
       }
       setState({ loading: false, player: scanData.player, scans: scanData.scans, result: scanData, error: null });
+      announceWhatsAppInvite();
     } catch (error) {
       setState({
         loading: false,
